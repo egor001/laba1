@@ -1,57 +1,73 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include<malloc.h>
 #include <conio.h>
 #include <locale.h>
 #include <math.h>
 #include <stdlib.h>
-typedef struct vector{
-	void* bukva;
-	int size;
+
+typedef struct vector {
+	char bukva; //название вектора?
+	int size; //не используется
 	void* buf;
 } vector;
-void vvod(vector* nov,int n,int k)
+
+void vvod(vector* nov, int n, int k)
 {
-	
-    int count=0;
-    int shet;
-	nov=(struct vector*)calloc(n,sizeof(struct vector));
-	nov->buf =(int*) calloc(k, sizeof(int*));
-	if (nov==NULL){
-		printf("�� ������� �������� ������. ��������� ���������.");
+
+	int count = 0;
+	int shet;
+	//выделение места для одного vector , который будет содержать вектора
+	nov = (vector*)calloc(1, sizeof(vector));
+	//выделение места для n векторов
+	nov->buf = (vector*)calloc(n, sizeof(vector));
+	//выделение места для k точек в векторах 
+	int i;
+	for( i = 0; i < n; ++i)
+		((vector*)nov->buf + i)->buf = (int*)calloc(k, sizeof(int));
+	if (nov == NULL) {
+		printf("Не удалось выделить память. Программа завершена");
 		exit(EXIT_FAILURE);
 	}
-	while(count<n)
+	while (count < n)
 	{
-		printf("������� �������� �����\n");
-		nov[count].bukva=getche();
+		printf("Введите название точки\n");
+		((vector*)nov->buf + count)->bukva = _getche();
 		printf("\n");
-		shet=0;
-		while (shet<k){
-		printf("������� ���������� ������\n ");
-		scanf("%d", &nov[count].buf[shet] );
-		shet++;
-	}
-	
+		shet = 0;
+		while (shet < k) {
+			printf("Введите название базиса\n ");
+			scanf("%d", &((int*)((vector*)nov->buf + count)->buf)[shet]);
+			shet++;
+		}
+
 		count++;
 	}
-	count=0;
-	shet=0;
-	while(count<n){
-		shet=0;
-		printf("%s,%d,%d\n",&nov[count].bukva);
-		while(shet<k){
-			printf("%d\n",&nov[count].buf[shet]);
+	count = 0;
+	shet = 0;
+	while (count < n) {
+		shet = 0;
+		printf("%c\n", ((vector*)nov->buf + count)->bukva);
+		while (shet < k) {
+			printf("%d\n", ((int*)((vector*)nov->buf + count)->buf)[shet]);
 			shet++;
 		}
 		count++;
-    }
-    
-    free(nov);
-    
+	}
+	//Освобождение памяти для точек
+	
+	for ( i = 0; i < n; ++i)
+		free(((vector*)nov->buf + i)->buf);
+	//Освобождение памяти для точек
+	if(nov->buf)
+		free(nov->buf);
+	//Освобождение для самого vector
+	if(nov)
+		free(nov);
 }
-  /*  void find_skalar(struct vector* nov,int n) //������� ���������� ���������� ������������ ���� ��������
+/*  void find_skalar(struct vector* nov,int n) //С„СѓРЅРєС†РёСЏ РЅР°С…РѕР¶РґРµРЅРёСЏ СЃРєР°Р»СЏСЂРЅРѕРіРѕ РїСЂРѕРёР·РІРµРґРµРЅРёСЏ РґРІСѓС… РІРµРєС‚РѕСЂРѕРІ
 {
-	printf("�������� ��� �����");
+	printf("РІС‹Р±РµСЂРµС‚Рµ РґРІРµ Р±СѓРєРІС‹");
 	int count=0;
 	int i=0;
 	double skal_pr,tochka1,tochka2,prx1,prx2,pry1,pry2;
@@ -74,7 +90,7 @@ void vvod(vector* nov,int n,int k)
 			i++;
 		}
 		if(i=2)
-		break;	
+		break;
 	}
 	skal_pr=prx1*prx2+pry1*pry2;
 	printf("%f",skal_pr);
@@ -83,18 +99,18 @@ void vvod(vector* nov,int n,int k)
 int main(void)
 {
 	setlocale(LC_ALL, "Rus");
-	printf("������� ���������� �����");
-	void* n;
+	printf("Введите количство точек");
+	int n;
 	scanf("%d", &n);
-	printf("�������� ���������� ����");
-	void* k;
-	scanf("%d", k);
-	while(n<1){
-	printf("������� ����������� ����������� �����");
-	scanf("%d", &n);
-    }
-	struct vector *nov;
-	vvod(nov,*(int*)n,*(int*)k);
+	printf("Введите количество осей");
+	int k;
+	scanf("%d", &k);
+	while (n < 1) {
+		printf("Введено некоректное количство точек");
+		scanf("%d", &n);
+	}
+	vector *nov = NULL;
+	vvod(nov, n, k);
 	return(0);
 }
 
